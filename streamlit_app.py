@@ -7,24 +7,26 @@ import matplotlib.animation as animation
 import tempfile
 
 #region plot
-st.title("LQR Control of Two-Mass Spring-Damper System")
+st.title("LQR Control")
 
 # --- Sliders for Q and R matrices ---
-st.header("LQR Tuning Parameters")
+st.sidebar.header("Tuning Parameters")
 
-q1 = st.slider("Q[0,0] (Position y₁)", 1.0, 1000.0, 100.0)
-q2 = st.slider("Q[1,1] (Position y₂)", 1.0, 1000.0, 100.0)
-q3 = st.slider("Q[2,2] (Velocity ẏ₁)", 0.1, 50.0, 1.0)
-q4 = st.slider("Q[3,3] (Velocity ẏ₂)", 0.1, 50.0, 1.0)
+apply_ur = st.sidebar.checkbox("Apply ur")
 
-r1 = st.slider("R[0,0] (Effort u₁)", 0.1, 100.0, 1.0)
-r2 = st.slider("R[1,1] (Effort u₂)", 0.1, 100.0, 1.0)
+q1 = st.sidebar.slider("Q[0,0] (Position y₁)", 1.0, 1000.0, 100.0)
+q2 = st.sidebar.slider("Q[1,1] (Position y₂)", 1.0, 1000.0, 100.0)
+q3 = st.sidebar.slider("Q[2,2] (Velocity ẏ₁)", 0.1, 50.0, 1.0)
+q4 = st.sidebar.slider("Q[3,3] (Velocity ẏ₂)", 0.1, 50.0, 1.0)
+
+r1 = st.sidebar.slider("R[0,0] (Effort u₁)", 0.1, 100.0, 1.0)
+r2 = st.sidebar.slider("R[1,1] (Effort u₂)", 0.1, 100.0, 1.0)
+
 
 # --- System Parameters ---
 m = 1.0
-k = 0.5
+k = 1.0
 b = 0.1
-apply_ur = True
 
 A = np.array([
     [0, 0, 1, 0],
@@ -63,7 +65,6 @@ t_eval = np.linspace(0, 5, 1000)
 sol = solve_ivp(dynamics, (0, 10), x0, t_eval=t_eval)
 
 # --- Plotting ---
-st.header("LQR Results")
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(sol.t, sol.y[0], color='blue', label=r'$y_1$')
 ax.plot(sol.t, sol.y[1], color='red', label=r'$y_2$')
