@@ -118,13 +118,14 @@ ax.legend(loc='upper center', ncol=2)
 f1_arrow = ax.arrow(0, 0.15, 0, 0, width=0.01, color='blue')
 f2_arrow = ax.arrow(0, 0.15, 0, 0, width=0.01, color='red')
 
+time_scale = 5
 def animate(i):
     global f1_arrow, f2_arrow
 
-    m1x = y1[i]
-    m2x = y2[i]
-    f1 = f1_array[i]
-    f2 = f2_array[i]
+    m1x = y1[i*time_scale]
+    m2x = y2[i*time_scale]
+    f1 = f1_array[i*time_scale]
+    f2 = f2_array[i*time_scale]
 
     # Update mass positions
     mass1.set_xy((m1x - mass_radius, -mass_radius))
@@ -144,7 +145,7 @@ def animate(i):
 
     return mass1, mass2, spring_line, damper_line, f1_arrow, f2_arrow
 
-ani = animation.FuncAnimation(fig, animate, frames=len(t), interval=20, blit=True)
+ani = animation.FuncAnimation(fig, animate, frames=round(len(t)/time_scale)-1, interval=20, blit=True)
 tmpfile = tempfile.NamedTemporaryFile(suffix=".gif", delete=False)
 ani.save(tmpfile.name, writer='pillow')
 st.image(tmpfile.name)
