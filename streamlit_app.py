@@ -64,22 +64,6 @@ x0 = np.zeros(4)
 t_eval = np.linspace(0, 5, 1000)
 sol = solve_ivp(dynamics, (0, 10), x0, t_eval=t_eval)
 
-# --- Plotting ---
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.plot(sol.t, sol.y[0], color='blue', label=r'$y_1$')
-ax.plot(sol.t, sol.y[1], color='red', label=r'$y_2$')
-ax.axhline(xr[0], color='blue', linestyle='--', linewidth=1.3, label=r'$y_1^{\mathrm{ref}}$')
-ax.axhline(xr[1], color='red', linestyle='--', linewidth=1.3, label=r'$y_2^{\mathrm{ref}}$')
-ax.set_xlabel("Time [s]")
-ax.set_ylabel("State")
-ax.grid(True)
-ax.legend()
-st.pyplot(fig)
-#endregion 
-
-#region animation
-
-# Extract state and compute control inputs
 y1 = sol.y[0]
 y2 = sol.y[1]
 y1_dot = sol.y[2]
@@ -89,6 +73,37 @@ U = -(X - xr) @ K.T + ur * apply_ur
 f1_array = U[:, 0]
 f2_array = U[:, 1]
 t = sol.t
+
+# --- Plotting ---
+st.header('Positions')
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(sol.t, sol.y[0], color='blue', label=r'$y_1$')
+ax.plot(sol.t, sol.y[1], color='red', label=r'$y_2$')
+ax.axhline(xr[0], color='blue', linestyle='--', linewidth=1.3, label=r'$y_1^{\mathrm{ref}}$')
+ax.axhline(xr[1], color='red', linestyle='--', linewidth=1.3, label=r'$y_2^{\mathrm{ref}}$')
+ax.set_xlabel("Time [s]")
+ax.set_ylabel("Positions [m]")
+ax.grid(True)
+ax.legend()
+st.pyplot(fig)
+
+st.header('Forces')
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(sol.t, f1_array, color='blue', label=r'$f_1$')
+ax.plot(sol.t, f2_array, color='red', label=r'$f_2$')
+ax.set_ylim(-10., 30)  # set y-axis limits
+ax.set_xlabel("Time [s]")
+ax.set_ylabel("Forces [N]")
+ax.grid(True)
+ax.legend()
+st.pyplot(fig)
+
+
+#endregion 
+
+#region animation
+
+# Extract state and compute control inputs
 
 # Visualization setup
 mass_radius = 0.1
@@ -119,7 +134,7 @@ ax.legend(loc='upper center', ncol=2)
 f1_arrow = ax.arrow(0, 0.15, 0, 0, width=0.01, color='blue')
 f2_arrow = ax.arrow(0, 0.15, 0, 0, width=0.01, color='red')
 
-time_scale = 5
+time_scale = 10
 def animate(i):
     global f1_arrow, f2_arrow
 
@@ -149,5 +164,6 @@ def animate(i):
 ani = animation.FuncAnimation(fig, animate, frames=round(len(t)/time_scale)-1, interval=20, blit=True)
 tmpfile = tempfile.NamedTemporaryFile(suffix=".gif", delete=False)
 ani.save(tmpfile.name, writer='pillow')
+st.header('Animation')
 st.image(tmpfile.name)
 
